@@ -1,0 +1,115 @@
+clc
+clear
+%close all
+
+load('yuan.mat',"net")
+
+numPredictions = 101;
+thetaTest1 = linspace(0,2*pi,numPredictions);
+rTest1 = linspace(0,1,numPredictions);
+
+
+Test1 = [];
+
+for i = 1:numPredictions
+    thetaTest = linspace(thetaTest1(i),thetaTest1(i),numPredictions);
+    rTest = rTest1;
+
+    Test = cat(1, thetaTest, rTest);
+    Test1 = cat(2, Test1, Test);
+end
+
+Test1 = dlarray(Test1,'CB');
+
+thetaTest2 = Test1(1,:);
+rTest2 = Test1(2,:);
+
+[u,utheta,ur,Utt,Utr,Urr,f]=  dlfeval(@rosenbrock,thetaTest2,rTest2,net);
+
+u = extractdata(u);
+% ureal = extractdata(ureal);
+% uxreal = extractdata(uxreal);
+% uyreal = extractdata(uyreal);
+
+utheta = extractdata(utheta);
+ur = extractdata(ur);
+Utt=extractdata(Utt);
+Utr=extractdata(Utr);
+Urr=extractdata(Urr);
+
+f=extractdata(f);
+
+
+X=xTest1;
+Y=yTest1;
+
+upred=reshape(u,numPredictions,numPredictions);
+ureal=reshape(ureal,numPredictions,numPredictions);
+uxpred=reshape(ux,numPredictions,numPredictions);
+uxreal=reshape(uxreal,numPredictions,numPredictions);
+uypred=reshape(uy,numPredictions,numPredictions);
+uyreal=reshape(uyreal,numPredictions,numPredictions);
+
+erroru=ureal-upred;
+maxerroru=max(max(erroru));
+minerroru=min(min(erroru));
+eu=[maxerroru minerroru];
+eu=max(abs(eu))
+
+errorux=uxreal-uxpred;
+maxerrorux=max(max(errorux));
+minerrorux=min(min(errorux));
+eux=[maxerrorux minerrorux];
+eux=max(abs(eux))
+
+erroruy=uyreal-uypred;
+maxerroruy=max(max(erroruy));
+minerroruy=min(min(erroruy));
+euy=[maxerroruy minerroruy];
+euy=max(abs(euy))
+
+f_pred = reshape(f,numPredictions,numPredictions);
+
+set(0,'defaultfigurecolor','w');
+
+figure(1)
+colormap("jet")
+pcolor(xTest1,yTest1,upred)
+colorbar
+shading interp
+set(gca,'Fontname','Times New Roman','fontsize',12,'FontWeight','bold')
+xlabel('\it{x}','FontWeight','bold')
+ylabel('\it{y}','FontWeight','bold')
+%title('gPINN Prediction','FontWeight','bold')
+
+figure(2)
+colormap("jet")
+pcolor(xTest1,yTest1,ureal)
+colorbar
+shading interp
+set(gca,'Fontname','Times New Roman','fontsize',12,'FontWeight','bold')
+xlabel('\it{x}','FontWeight','bold')
+ylabel('\it{y}','FontWeight','bold')
+%title('Exact Solution','FontWeight','bold')
+
+figure(3)
+colormap("jet")
+pcolor(xTest1,yTest1,(abs(erroru)))
+colorbar
+shading interp
+set(gca,'Fontname','Times New Roman','fontsize',12,'FontWeight','bold')
+xlabel('\it{x}','FontWeight','bold')
+ylabel('\it{y}','FontWeight','bold')
+%title('gPINN Absolute Error of u','FontWeight','bold')
+
+
+% figure(6)
+% colormap("turbo")
+% pcolor(xTest1,yTest1,f_pred)
+% colorbar
+% shading interp
+% set(gca,'Fontname','Times New Roman','fontsize',12,'FontWeight','bold')
+% xlabel('x','FontWeight','bold')
+% ylabel('y','FontWeight','bold')
+% title('f1','FontWeight','bold')
+
