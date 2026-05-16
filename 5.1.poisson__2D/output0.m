@@ -2,7 +2,9 @@ clc
 clear all;
 close all;
 
-load('bi13.mat',"net")
+%load('pinn13.mat',"net"); %PINN
+%load('gpinn13_0.001.mat',"net");  %g-PINN(w_g=0.001)
+load('bi13.mat',"net");      %bi-PINN
 
 numPredictions = 101;
 xTest1 = linspace(0,1,numPredictions);
